@@ -54,6 +54,29 @@ namespace AttendanceClockingManagementSystem.API.Controllers
         [HttpPost("Create")]
         public async Task<ActionResult> Create(AddQRCodeDto addQRCodeDto)
         {
+            // check if qr was already generated
+
+            var parameters = new GetQRCodesResourceParameters()
+            {
+                StartDate = DateTime.Now.Date,
+                EndDate = DateTime.Now.Date,
+                EmployeeCode = addQRCodeDto.EmployeeCode
+            };
+
+            var exist = await _qRCodeRepository.GetAllQRCode(parameters);
+
+            string existingcode = "";
+
+            if (exist.Count > 0 )
+            {
+                foreach (var item in exist)
+                {
+                   existingcode = item.Code;
+                }
+
+                return Ok(existingcode);
+            }
+
             var qRCode = _mapper.Map<AddQRCodeDto, QRCode>(addQRCodeDto);
 
             var result = await _qRCodeRepository.AddQRCode(qRCode);
