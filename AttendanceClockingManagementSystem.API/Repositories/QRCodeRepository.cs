@@ -33,12 +33,7 @@ namespace AttendanceClockingManagementSystem.API.Repositories
 
                await  _applicationDbContext.SaveChangesAsync();
 
-               
-
-             
-
-              
-
+   
                return qRCode.Code;
 
                 
@@ -64,7 +59,7 @@ namespace AttendanceClockingManagementSystem.API.Repositories
             {
 
                
-                _applicationDbContext.Update(qRCode);
+                _applicationDbContext.QRCodes.Update(qRCode);
 
                 await _applicationDbContext.SaveChangesAsync();
 

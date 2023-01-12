@@ -137,6 +137,23 @@ namespace AttendanceClockingManagementSystem.API.Controllers
             return BadRequest(result);
         }
 
-       
+        [HttpPut]
+        public async Task<ActionResult> Put(int id, EditAttendanceDto editAttendanceDto)
+        {
+            var exist = await _attendanceRepository.GetAttendance(id);
+
+            exist.Comment = editAttendanceDto.Comment;
+
+            var result = await _attendanceRepository.EditAttendance(exist);
+
+            if (result)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(result);
+        }
+
+
     }
 }

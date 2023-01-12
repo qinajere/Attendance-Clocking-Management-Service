@@ -58,6 +58,10 @@ namespace AttendanceClockingManagementSystem.API.Repositories
 
                 attendance.EmployeeName = employeeInfo.FirstName + " " + employeeInfo.LastName;
 
+                attendance.Branch = employeeInfo.BranchName;
+
+                attendance.Department = employeeInfo.DepartmentName;
+
                 attendance.ClockIn = DateTime.Now.TimeOfDay;
 
                 attendance.DateCreated = DateTime.Now;

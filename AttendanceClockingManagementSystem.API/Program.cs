@@ -21,6 +21,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
 builder.Services.AddScoped<IOfficeTimingRepository, OfficeTimingRepository>();
 builder.Services.AddScoped<IQRCodeRepository, QRCodeRepository>();
+builder.Services.AddScoped<IAbsentRepository, AbsentRepository>();
+builder.Services.AddScoped<ILeaveRepository, LeaveRepository>();
 
 // AutoMapper
 
