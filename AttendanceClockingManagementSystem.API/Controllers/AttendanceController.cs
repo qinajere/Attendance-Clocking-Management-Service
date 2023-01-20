@@ -83,6 +83,7 @@ namespace AttendanceClockingManagementSystem.API.Controllers
                
                 response = _mapper.Map<Attendance, GetAttendanceResponse>(attendance);
 
+                
                
                     if (response.ClockIn > timing.ArrivalTime)
                     {

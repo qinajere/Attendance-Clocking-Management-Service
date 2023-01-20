@@ -2,7 +2,10 @@
 using AttendanceClockingManagementSystem.API.DataAccess.Model;
 using AttendanceClockingManagementSystem.API.Resources.Parameters;
 using AttendanceClockingManagementSystem.API.Resources.Responses;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Serilog;
+using System.Net.Http;
 
 namespace AttendanceClockingManagementSystem.API.Repositories
 {
@@ -10,17 +13,24 @@ namespace AttendanceClockingManagementSystem.API.Repositories
     {
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly ILeaveRepository _leaveRepository;
+        private readonly IConfiguration _configuration;
+        private readonly IAttendanceRepository _attendanceRepository;
+        private readonly HttpClient _httpClient;
 
-        public AbsentRepository(ApplicationDbContext applicationDbContext, ILeaveRepository leaveRepository)
+        public AbsentRepository(ApplicationDbContext applicationDbContext, ILeaveRepository leaveRepository, IConfiguration configuration, IAttendanceRepository attendanceRepository)
         {
             _applicationDbContext = applicationDbContext;
             _leaveRepository = leaveRepository;
+            _configuration = configuration;
+            _attendanceRepository = attendanceRepository;
+            _httpClient = new HttpClient();
         }
         public async Task<bool> AddAbsent(Absent absent)
         {
             try
             {
                 _applicationDbContext.Absents.Add(absent);
+                _applicationDbContext.SaveChanges();
 
                 return true;    
             }
@@ -31,6 +41,26 @@ namespace AttendanceClockingManagementSystem.API.Repositories
 
                 return false;
             }
+        }
+
+        public async Task<bool> AddAbsentByRange(List<Absent> absentList)
+        {
+            try
+            {
+                await _applicationDbContext.Absents.AddRangeAsync(absentList);
+                
+                 _applicationDbContext.SaveChanges();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                Log.Error("Failed to update absent entry : " + ex.Message, ex);
+
+                return false;
+            }
+            
         }
 
         public async Task<bool> EditAbsent(Absent absent)
@@ -75,22 +105,58 @@ namespace AttendanceClockingManagementSystem.API.Repositories
             }
         }
 
-        public async Task<GetAbsentByDateResponse> GetAbsentByDate(DateOnly date)
+        public async Task<List<GetAbsentByDateResponse>> GetAbsentByDate(DateOnly date)
         {
-            var response = new GetAbsentByDateResponse();
+            
+
             // get all employee codes
 
+            var employeeCodes = await this.GetAllEmployeeCodes();
 
             // get all employees on leave on this day
 
-            var parameters = new GetLeaveResourceParameters() { StartDate = date, EndDate = date};
+            var leaveParameters = new GetLeaveResourceParameters() { StartDate = date, EndDate = date};
 
-            var EmployeesOnLeave = _leaveRepository.GetAllLeave(parameters);
+            var EmployeesOnLeave = await _leaveRepository.GetAllLeave(leaveParameters);
 
             // get all employees that are present
 
+            var attendanceParameters = new GetAttendanceResourceParameters() { StartDate = DateTime.Today, EndDate = DateTime.Today };
+            var presentEmployees = await _attendanceRepository.GetAllAttendances(attendanceParameters);
 
-            return response;
+            // check for employees that were absent
+
+            var absent = employeeCodes.Where(p => !presentEmployees.Any(p2 => p2.EmployeeCode == p.EmployeeCode));
+
+            var responses = new List<GetAbsentByDateResponse>();
+
+            foreach (var item in absent)
+            {
+                var response = new GetAbsentByDateResponse();
+
+                response.EmployeeCode = item.EmployeeCode;
+                response.EmployeeName = item.FirstName + " " + item.LastName;
+                response.BranchName = item.BranchName;
+                response.DepartmentName = item.DepartmentName;
+                response.OnLeave = false; 
+                
+                responses.Add(response);
+            }
+
+            // mark those absent but on leave
+            
+            foreach (var item in responses)
+            {
+                foreach (var item2 in EmployeesOnLeave)
+                {
+                    if (item2.EmployeeCode == item.EmployeeCode)
+                    {
+                        item.OnLeave = true;
+                    }
+                }
+            }
+            
+            return responses;
 
 
         }
@@ -128,6 +194,41 @@ namespace AttendanceClockingManagementSystem.API.Repositories
             {
 
                 Log.Error("Failed to get absent entries:  " + ex.Message, ex);
+                return null;
+            }
+        }
+
+        public async Task<List<UMSEmployeeCode>> GetAllEmployeeCodes()
+        {
+            try
+            {
+                var link = _configuration.GetSection("Constants").GetSection("EmployeeCodes").Value.ToString();
+
+
+                var builder = new UriBuilder(link);
+                var url = builder.ToString();
+
+                var response = await _httpClient.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+
+
+                var createdTask = JsonConvert.DeserializeObject<List<UMSEmployeeCode>>(await response.Content.ReadAsStringAsync());
+
+                if (createdTask == null)
+                {
+                    return null;
+                }
+
+                return createdTask;
+            }
+            catch (Exception ex)
+            {
+
+                Log.Error("Failed to get employee info : " + ex.Message);
                 return null;
             }
         }

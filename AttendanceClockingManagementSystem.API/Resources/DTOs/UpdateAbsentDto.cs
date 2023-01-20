@@ -3,6 +3,6 @@
     public class UpdateAbsentDto
     {
         public string Reason { get; set; }
-        public bool OnLeave { get; set; }
+       
     }
 }

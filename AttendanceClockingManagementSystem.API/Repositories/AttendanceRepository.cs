@@ -65,6 +65,8 @@ namespace AttendanceClockingManagementSystem.API.Repositories
                 attendance.ClockIn = DateTime.Now.TimeOfDay;
 
                 attendance.DateCreated = DateTime.Now;
+                attendance.Comment = "";
+                
                
                 _applicationDbContext.Attendances.Add(attendance);
 
@@ -181,9 +183,7 @@ namespace AttendanceClockingManagementSystem.API.Repositories
 
                     }
 
-                    
-
-
+ 
 
                     return result;
    

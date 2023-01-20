@@ -22,7 +22,7 @@ namespace AttendanceClockingManagementSystem.API.Controllers
 
         public AbsentController(IAbsentRepository absentRepository, IMapper mapper, IAttendanceRepository attendanceRepository)
         {
-           
+
             _absentRepository = absentRepository;
             _mapper = mapper;
             _attendanceRepository = attendanceRepository;
@@ -36,16 +36,48 @@ namespace AttendanceClockingManagementSystem.API.Controllers
             return Ok(absents);
         }
 
+        [HttpGet("Date")]
+        public async Task<ActionResult> GetByDate()
+        {
+            var date = DateOnly.FromDateTime(dateTime: DateTime.Now);
+
+            var absents = await _absentRepository.GetAbsentByDate(date);
+
+            return Ok(absents);
+        }
+
         // GET api/<AbsentController>/5
         [HttpGet("id")]
         public async Task<ActionResult> GetById(int id)
         {
             var absent = await _absentRepository.GetAbsent(id);
-            
+
             return Ok(absent);
         }
 
-        // POST api/<AbsentController>
+
+        [HttpPost("Add-Range")]
+        public async Task<ActionResult> AddRange(List<AddAbsentRangeDto> addAbsentRangeDto)
+        {
+            var absentList = new List<Absent>();
+
+            foreach (var item in addAbsentRangeDto)
+            {
+                var absent = _mapper.Map<AddAbsentRangeDto, Absent>(item);
+
+                absent.DateCreated = DateTime.Now;
+
+                absentList.Add(absent);
+            }
+
+            var result = await _absentRepository.AddAbsentByRange(absentList);
+
+            return Ok(result);
+
+        }
+
+
+            // POST api/<AbsentController>
         [HttpPost]
         public async Task<ActionResult> Post(AddAbsentDto addAbsentDto)
         {
@@ -72,32 +104,28 @@ namespace AttendanceClockingManagementSystem.API.Controllers
 
             };
 
-            var result = _absentRepository.AddAbsent(absent);
+            var result = await _absentRepository.AddAbsent(absent);
 
             return Ok(result);
-           
+
         }
 
         // PUT api/<AbsentController>/5
-        [HttpPut("{id}")]
+        [HttpPut("id")]
         public async Task<ActionResult> Put(int id, [FromBody] UpdateAbsentDto updateAbsent)
         {
-           var existingAbsent = await _absentRepository.GetAbsent(id);
+            var existingAbsent = await _absentRepository.GetAbsent(id);
 
             existingAbsent.Reason = updateAbsent.Reason;
-            existingAbsent.OnLeave = updateAbsent.OnLeave;
+            
 
             var result = await _absentRepository.EditAbsent(existingAbsent);
 
             return Ok(result);
 
-   
+
         }
 
-       /* [HttpGet("Absent")]
-        public async Task<ActionResult> GetAbsent(int id)
-        {
-           
-        }*/
+
     }
 }

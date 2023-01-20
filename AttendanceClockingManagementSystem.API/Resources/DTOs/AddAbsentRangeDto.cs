@@ -1,6 +1,6 @@
-﻿namespace AttendanceClockingManagementSystem.API.Resources.Responses
+﻿namespace AttendanceClockingManagementSystem.API.Resources.DTOs
 {
-    public class GetAbsentByDateResponse
+    public class AddAbsentRangeDto
     {
         public string EmployeeCode { get; set; }
         public string EmployeeName { get; set; }

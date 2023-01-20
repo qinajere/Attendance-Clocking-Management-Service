@@ -19,6 +19,7 @@ namespace AttendanceClockingManagementSystem.API.Repositories
             try
             {
                 _applicationDbContext.Leaves.Add(leave);
+                _applicationDbContext.SaveChanges();
 
                 return true;
             }
@@ -26,6 +27,24 @@ namespace AttendanceClockingManagementSystem.API.Repositories
             {
 
                 Log.Error("Failed to add leave entry : " + ex);
+
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteLeave(Leave leave)
+        {
+            try
+            {
+                _applicationDbContext.Leaves.Remove(leave);
+                _applicationDbContext.SaveChanges();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                Log.Error("Failed to delete leave entry : " + ex.Message, ex);
 
                 return false;
             }
@@ -61,7 +80,7 @@ namespace AttendanceClockingManagementSystem.API.Repositories
                 {
                     if (parameters.StartDate == parameters.EndDate)
                     {
-                        query = query.Where(u => u.From >= parameters.StartDate && u.To <= parameters.EndDate);
+                        query = query.Where(u => parameters.StartDate >= u.From && parameters.EndDate <= u.To);
                     }
                     else 
                     {

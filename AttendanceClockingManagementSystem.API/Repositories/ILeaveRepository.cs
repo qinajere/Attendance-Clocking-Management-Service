@@ -9,5 +9,6 @@ namespace AttendanceClockingManagementSystem.API.Repositories
         Task<bool> EditLeave(Leave leave);
         Task<List<Leave>> GetAllLeave(GetLeaveResourceParameters parameters);
         Task<Leave> GetLeave(int id);
+        Task<bool> DeleteLeave(Leave leave);
     }
 }

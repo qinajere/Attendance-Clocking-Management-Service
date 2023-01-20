@@ -11,6 +11,7 @@ namespace AttendanceClockingManagementSystem.API.Resources.Mapping
             CreateMap<AddQRCodeDto, QRCode>();
             CreateMap<AddOfficeTimingDto, OfficeTiming>();
             CreateMap<AddAttendanceDto, Attendance>();
+            CreateMap<AddAbsentRangeDto, Absent>();
 
         }
     }

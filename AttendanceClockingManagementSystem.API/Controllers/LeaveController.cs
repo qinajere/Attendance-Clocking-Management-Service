@@ -57,6 +57,11 @@ namespace AttendanceClockingManagementSystem.API.Controllers
                 return BadRequest("Failed to get employee");
             }
 
+            var from = DateOnly.FromDateTime(dateTime: addLeaveDto.From);
+            var to = DateOnly.FromDateTime( dateTime: addLeaveDto.To);
+           
+
+
 
             var leave = new Leave()
             {
@@ -64,28 +69,43 @@ namespace AttendanceClockingManagementSystem.API.Controllers
                 EmployeeName = employeeInfo.FirstName + " " + employeeInfo.LastName,
                 BranchName = employeeInfo.BranchName,
                 DepartmentName = employeeInfo.DepartmentName,
-                DateCreated = DateTime.Now
+                DateCreated = DateTime.Now,
+                From = from,
+                To = to,
                
-
             };
 
-            var result = _leaveRepository.AddLeave(leave);
+            var result = await _leaveRepository.AddLeave(leave);
 
             return Ok(result);
 
         }
 
         // PUT api/<AbsentController>/5
-        [HttpPut("{id}")]
+        [HttpPut("id")]
         public async Task<ActionResult> Put(int id, [FromBody] UpdateLeaveDto updateLeave)
         {
             var existingLeave = await _leaveRepository.GetLeave(id);
 
+
+
             existingLeave.DateCreated = DateTime.Now;
-            existingLeave.From = updateLeave.From;
-            existingLeave.To = updateLeave.To;
+            existingLeave.From = DateOnly.FromDateTime(dateTime: updateLeave.From); 
+            existingLeave.To = DateOnly.FromDateTime(dateTime: updateLeave.To);
 
             var result = await _leaveRepository.EditLeave(existingLeave);
+
+            return Ok(result);
+
+
+        }
+
+        [HttpDelete("id")]
+        public async Task<ActionResult> Put(int id)
+        {
+            var existingLeave = await _leaveRepository.GetLeave(id);
+
+            var result = await _leaveRepository.DeleteLeave(existingLeave);
 
             return Ok(result);
 
