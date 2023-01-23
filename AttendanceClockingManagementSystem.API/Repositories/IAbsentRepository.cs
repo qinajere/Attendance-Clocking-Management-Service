@@ -12,6 +12,6 @@ namespace AttendanceClockingManagementSystem.API.Repositories
         Task<List<Absent>> GetAllAbsent(GetAbsentResourceParameters parameters);
         Task<Absent> GetAbsent(int id);
         Task<List<UMSEmployeeCode>> GetAllEmployeeCodes();
-        Task<List<GetAbsentByDateResponse>> GetAbsentByDate(DateOnly date);
+        Task<List<GetAbsentByDateResponse>> GetAbsentByDate(DateTime date);
     }
 }

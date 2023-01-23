@@ -11,6 +11,7 @@ namespace AttendanceClockingManagementSystem.API.Resources.Mapping
             CreateMap<Attendance, GetAttendanceResponse>();
             CreateMap<QRCode, GetQRCodeResponse>();
             CreateMap<OfficeTiming, GetOfficeTimingResponse>();
+            CreateMap<Leave, GetLeaveResponse>();
         }
     }
 }

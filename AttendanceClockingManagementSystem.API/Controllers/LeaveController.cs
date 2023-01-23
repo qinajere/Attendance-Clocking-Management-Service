@@ -2,6 +2,7 @@
 using AttendanceClockingManagementSystem.API.Repositories;
 using AttendanceClockingManagementSystem.API.Resources.DTOs;
 using AttendanceClockingManagementSystem.API.Resources.Parameters;
+using AttendanceClockingManagementSystem.API.Resources.Responses;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -31,7 +32,20 @@ namespace AttendanceClockingManagementSystem.API.Controllers
         {
             var leaves = await _leaveRepository.GetAllLeave(parameters);
 
-            return Ok(leaves);
+            var responses = new List<GetLeaveResponse>();
+
+            foreach (var item in leaves)
+            {
+                var response = _mapper.Map<Leave, GetLeaveResponse>(item);
+
+                response.From = item.From.ToString();
+                response.To = item.To.ToString();
+
+                responses.Add(response);    
+            }
+
+
+            return Ok(responses);
         }
 
         // GET api/<AbsentController>/5
@@ -40,7 +54,12 @@ namespace AttendanceClockingManagementSystem.API.Controllers
         {
             var leave = await _leaveRepository.GetLeave(id);
 
-            return Ok(leave);
+            var response = _mapper.Map<Leave, GetLeaveResponse>(leave);
+
+            response.From = leave.From.ToString();
+            response.To = leave.To.ToString();
+
+            return Ok(response);
         }
 
         // POST api/<AbsentController>

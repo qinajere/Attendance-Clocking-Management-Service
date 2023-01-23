@@ -39,7 +39,7 @@ namespace AttendanceClockingManagementSystem.API.Controllers
         [HttpGet("Date")]
         public async Task<ActionResult> GetByDate()
         {
-            var date = DateOnly.FromDateTime(dateTime: DateTime.Now);
+            var date =  DateTime.Now;
 
             var absents = await _absentRepository.GetAbsentByDate(date);
 

@@ -78,13 +78,17 @@ namespace AttendanceClockingManagementSystem.API.Repositories
 
                 if (parameters.StartDate != null && parameters.EndDate != null)
                 {
+                    var dateStart = DateOnly.FromDateTime(dateTime: parameters.StartDate.Value);
+
+                    var  dateEnd = DateOnly.FromDateTime(dateTime: parameters.EndDate.Value);   
+
                     if (parameters.StartDate == parameters.EndDate)
                     {
-                        query = query.Where(u => parameters.StartDate >= u.From && parameters.EndDate <= u.To);
+                        query = query.Where(u => dateStart >= u.From && dateEnd <= u.To);
                     }
                     else 
                     {
-                        query = query.Where(u => u.From <= parameters.EndDate && parameters.StartDate <= u.To);
+                        query = query.Where(u => u.From <= dateEnd && dateStart <= u.To);
                     }
                    
                 }

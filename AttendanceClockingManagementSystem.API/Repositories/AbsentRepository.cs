@@ -105,7 +105,7 @@ namespace AttendanceClockingManagementSystem.API.Repositories
             }
         }
 
-        public async Task<List<GetAbsentByDateResponse>> GetAbsentByDate(DateOnly date)
+        public async Task<List<GetAbsentByDateResponse>> GetAbsentByDate(DateTime date)
         {
             
 
