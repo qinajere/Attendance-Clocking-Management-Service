@@ -7,6 +7,7 @@
         public string EmployeeName { get; set; }
         public TimeSpan ClockIn { get; set; }
         public TimeSpan ClockOut { get; set; }
+        public DateTimeOffset DateCreated { get; set; }
         public string Branch { get; set; }
         public string Department { get; set; }
         public string QRCodeID { get; set; }
